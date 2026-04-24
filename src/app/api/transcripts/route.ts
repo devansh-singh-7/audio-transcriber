@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import auth from "@/lib/auth";
 import { DATABASE_URL_MISSING_MESSAGE, getDb } from "@/lib/db";
-import { ensureDatabaseSchema } from "@/lib/ensure-db";
+import { getSafeDatabaseMessage, isMissingRelationError, isPermissionError } from "@/lib/db-errors";
 import { transcript } from "@/lib/schema";
 import type { TranscriptItem } from "@/lib/transcript-types";
 
@@ -26,8 +26,6 @@ export async function GET(request: Request) {
       );
     }
 
-    await ensureDatabaseSchema();
-
     const transcripts: TranscriptItem[] = await db
       .select({
         id: transcript.id,
@@ -41,6 +39,13 @@ export async function GET(request: Request) {
 
     return NextResponse.json(transcripts);
   } catch (error) {
+    if (isMissingRelationError(error) || isPermissionError(error)) {
+      return NextResponse.json(
+        { error: getSafeDatabaseMessage(error) },
+        { status: 503 }
+      );
+    }
+
     const message =
       error instanceof Error ? error.message : "Unexpected server error";
     return NextResponse.json(

@@ -15,25 +15,28 @@ export default function DashboardClient() {
   const [isLoadingTranscripts, setIsLoadingTranscripts] = useState(true);
   const sessionUserId = session?.user?.uid ?? null;
   const sessionErrorMessage = sessionError ?? null;
+  const sessionNotice = useMemo(() => {
+    if (isPending) {
+      return null;
+    }
+
+    if (sessionErrorMessage) {
+      return sessionErrorMessage;
+    }
+
+    if (!sessionUserId) {
+      return "The dashboard cookie exists, but the signed-in session was not restored. Sign out and sign back in.";
+    }
+
+    return null;
+  }, [isPending, sessionErrorMessage, sessionUserId]);
 
   useEffect(() => {
     if (isPending) {
       return;
     }
 
-    if (sessionErrorMessage) {
-      setTranscripts([]);
-      setIsLoadingTranscripts(false);
-      setTranscriptError(sessionErrorMessage);
-      return;
-    }
-
-    if (!sessionUserId) {
-      setTranscripts([]);
-      setIsLoadingTranscripts(false);
-      setTranscriptError(
-        "The dashboard cookie exists, but the Firebase client session was not restored. Sign out and sign back in."
-      );
+    if (sessionNotice || !sessionUserId) {
       return;
     }
 
@@ -70,7 +73,7 @@ export default function DashboardClient() {
     return () => {
       cancelled = true;
     };
-  }, [isPending, sessionUserId, sessionErrorMessage]);
+  }, [isPending, sessionNotice, sessionUserId]);
 
   const transcriptCount = useMemo(() => transcripts.length, [transcripts]);
 
@@ -104,12 +107,15 @@ export default function DashboardClient() {
             {transcriptCount}
           </span>
         </div>
-        {transcriptError ? (
+        {sessionNotice || transcriptError ? (
           <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            {transcriptError}
+            {sessionNotice ?? transcriptError}
           </div>
         ) : null}
-        <TranscriptList transcripts={transcripts} isLoading={isLoadingTranscripts} />
+        <TranscriptList
+          transcripts={transcripts}
+          isLoading={isLoadingTranscripts && !sessionNotice}
+        />
       </section>
     </>
   );
