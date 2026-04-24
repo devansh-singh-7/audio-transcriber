@@ -1,14 +1,21 @@
 "use client";
+/* eslint-disable react-hooks/refs, react-hooks/set-state-in-effect */
 
-import { useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  type FormEvent,
+  type RefObject,
+} from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Music2 } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Music2 } from "lucide-react";
 
 interface PupilProps {
   size?: number;
@@ -36,10 +43,7 @@ const Pupil = ({
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   const calculatePupilPosition = () => {
@@ -52,16 +56,12 @@ const Pupil = ({
     const pupil = pupilRef.current.getBoundingClientRect();
     const pupilCenterX = pupil.left + pupil.width / 2;
     const pupilCenterY = pupil.top + pupil.height / 2;
-
     const deltaX = mouseX - pupilCenterX;
     const deltaY = mouseY - pupilCenterY;
     const distance = Math.min(Math.sqrt(deltaX ** 2 + deltaY ** 2), maxDistance);
-
     const angle = Math.atan2(deltaY, deltaX);
-    const x = Math.cos(angle) * distance;
-    const y = Math.sin(angle) * distance;
 
-    return { x, y };
+    return { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance };
   };
 
   const pupilPosition = calculatePupilPosition();
@@ -113,10 +113,7 @@ const EyeBall = ({
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   const calculatePupilPosition = () => {
@@ -129,16 +126,12 @@ const EyeBall = ({
     const eye = eyeRef.current.getBoundingClientRect();
     const eyeCenterX = eye.left + eye.width / 2;
     const eyeCenterY = eye.top + eye.height / 2;
-
     const deltaX = mouseX - eyeCenterX;
     const deltaY = mouseY - eyeCenterY;
     const distance = Math.min(Math.sqrt(deltaX ** 2 + deltaY ** 2), maxDistance);
-
     const angle = Math.atan2(deltaY, deltaX);
-    const x = Math.cos(angle) * distance;
-    const y = Math.sin(angle) * distance;
 
-    return { x, y };
+    return { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance };
   };
 
   const pupilPosition = calculatePupilPosition();
@@ -194,14 +187,11 @@ function LoginPage() {
       setMouseX(event.clientX);
       setMouseY(event.clientY);
     };
-
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   useEffect(() => {
-    const getRandomBlinkInterval = () => Math.random() * 4000 + 3000;
-
     const scheduleBlink = () => {
       const blinkTimeout = setTimeout(() => {
         setIsPurpleBlinking(true);
@@ -209,7 +199,7 @@ function LoginPage() {
           setIsPurpleBlinking(false);
           scheduleBlink();
         }, 150);
-      }, getRandomBlinkInterval());
+      }, Math.random() * 4000 + 3000);
 
       return blinkTimeout;
     };
@@ -219,8 +209,6 @@ function LoginPage() {
   }, []);
 
   useEffect(() => {
-    const getRandomBlinkInterval = () => Math.random() * 4000 + 3000;
-
     const scheduleBlink = () => {
       const blinkTimeout = setTimeout(() => {
         setIsBlackBlinking(true);
@@ -228,7 +216,7 @@ function LoginPage() {
           setIsBlackBlinking(false);
           scheduleBlink();
         }, 150);
-      }, getRandomBlinkInterval());
+      }, Math.random() * 4000 + 3000);
 
       return blinkTimeout;
     };
@@ -240,41 +228,29 @@ function LoginPage() {
   useEffect(() => {
     if (isTyping) {
       setIsLookingAtEachOther(true);
-      const timer = setTimeout(() => {
-        setIsLookingAtEachOther(false);
-      }, 800);
+      const timer = setTimeout(() => setIsLookingAtEachOther(false), 800);
       return () => clearTimeout(timer);
     }
-
     setIsLookingAtEachOther(false);
   }, [isTyping]);
 
   useEffect(() => {
     if (password.length > 0 && showPassword) {
-      const schedulePeek = () => {
-        const peekInterval = setTimeout(() => {
-          setIsPurplePeeking(true);
-          setTimeout(() => {
-            setIsPurplePeeking(false);
-          }, 800);
-        }, Math.random() * 3000 + 2000);
-        return peekInterval;
-      };
-
-      const firstPeek = schedulePeek();
+      const firstPeek = setTimeout(() => {
+        setIsPurplePeeking(true);
+        setTimeout(() => setIsPurplePeeking(false), 800);
+      }, Math.random() * 3000 + 2000);
       return () => clearTimeout(firstPeek);
     }
-
     setIsPurplePeeking(false);
   }, [password, showPassword, isPurplePeeking]);
 
-  const calculatePosition = (ref: RefObject<HTMLDivElement>) => {
+  const calculatePosition = (ref: RefObject<HTMLDivElement | null>) => {
     if (!ref.current) return { faceX: 0, faceY: 0, bodySkew: 0 };
 
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 3;
-
     const deltaX = mouseX - centerX;
     const deltaY = mouseY - centerY;
 
@@ -297,12 +273,10 @@ function LoginPage() {
 
     try {
       const result = await authClient.signIn.email({ email, password });
-
       if (result.error) {
         setError("Invalid email or password. Please try again.");
         return;
       }
-
       router.push("/dashboard");
       router.refresh();
     } catch {
@@ -313,8 +287,8 @@ function LoginPage() {
   };
 
   return (
-    <div className="grid min-h-screen bg-background lg:grid-cols-2">
-      <div className="relative hidden flex-col justify-between bg-linear-to-br from-primary/90 via-primary to-primary/80 p-12 text-primary-foreground lg:flex">
+    <div className="grid min-h-screen lg:grid-cols-2">
+      <div className="relative hidden flex-col justify-between bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 text-primary-foreground lg:flex">
         <div className="relative z-20">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary-foreground/10 backdrop-blur-sm">
@@ -324,8 +298,8 @@ function LoginPage() {
           </div>
         </div>
 
-        <div className="relative z-20 flex h-125 items-end justify-center">
-          <div className="relative" style={{ width: "550px", height: "400px" }}>
+        <div className="relative z-20 flex h-[500px] items-end justify-center">
+          <div className="relative h-[400px] w-[550px]">
             <div
               ref={purpleRef}
               className="absolute bottom-0 transition-all duration-700 ease-in-out"
@@ -598,7 +572,7 @@ function LoginPage() {
                 />
               </div>
               <div
-                className="absolute h-1 w-20 rounded-full bg-[#2D2D2D] transition-all duration-200 ease-out"
+                className="absolute h-[4px] w-20 rounded-full bg-[#2D2D2D] transition-all duration-200 ease-out"
                 style={{
                   left:
                     password.length > 0 && showPassword
@@ -616,13 +590,13 @@ function LoginPage() {
 
         <div className="relative z-20" />
 
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-size-[20px_20px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px]" />
         <div className="absolute right-1/4 top-1/4 size-64 rounded-full bg-primary-foreground/10 blur-3xl" />
         <div className="absolute bottom-1/4 left-1/4 size-96 rounded-full bg-primary-foreground/5 blur-3xl" />
       </div>
 
       <div className="flex items-center justify-center bg-background p-8">
-        <div className="w-full max-w-105">
+        <div className="w-full max-w-[420px]">
           <div className="mb-12 flex items-center justify-center gap-2 text-lg font-semibold lg:hidden">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
               <Music2 className="size-4 text-primary" />
@@ -642,6 +616,7 @@ function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                placeholder="anna@gmail.com"
                 value={email}
                 autoComplete="off"
                 onChange={(event) => setEmail(event.target.value)}
@@ -660,6 +635,7 @@ function LoginPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
@@ -670,11 +646,7 @@ function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  {showPassword ? (
-                    <EyeOff className="size-5" />
-                  ) : (
-                    <Eye className="size-5" />
-                  )}
+                  {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
                 </button>
               </div>
             </div>
@@ -694,12 +666,7 @@ function LoginPage() {
               </div>
             )}
 
-            <Button
-              type="submit"
-              className="h-12 w-full bg-linear-to-r from-[#6C3FF5] to-[#4F46E5] text-base font-medium text-white shadow-[0_10px_24px_rgba(79,70,229,0.35)] hover:brightness-110"
-              size="lg"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="h-12 w-full text-base font-medium" size="lg" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Log in"}
             </Button>
           </form>

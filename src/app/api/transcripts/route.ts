@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import auth from "@/lib/auth";
 import db from "@/lib/db";
 import { transcript } from "@/lib/schema";
+import type { TranscriptItem } from "@/components/TranscriptList";
 
 export async function GET(request: Request) {
   try {
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let transcripts = [];
+    let transcripts: TranscriptItem[] = [];
 
     try {
       transcripts = await db

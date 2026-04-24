@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f8fc;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --primary: #6c3ff5;
+  --primary-foreground: #ffffff;
+  --secondary: #eaf0ff;
+  --secondary-foreground: #1f2937;
+  --muted: #eef2f8;
+  --muted-foreground: #64748b;
+  --accent: #e7edff;
+  --accent-foreground: #243047;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #d8e1ee;
+  --input: #d3dbe8;
+  --ring: #8fa7d4;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(181, 203, 255, 0.24) 0%, rgba(181, 203, 255, 0) 36%),
+    radial-gradient(circle at top right, rgba(187, 226, 214, 0.26) 0%, rgba(187, 226, 214, 0) 36%),
+    linear-gradient(180deg, #f8f9fd 0%, var(--background) 52%, #f2f5fa 100%);
+  color: var(--foreground);
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}

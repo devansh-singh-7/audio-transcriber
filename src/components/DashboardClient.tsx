@@ -22,8 +22,8 @@ export default function DashboardClient({ initialTranscripts }: DashboardClientP
 
   return (
     <>
-      <section className="mt-3 rounded-xl border border-[#e5eaf3] bg-[#fbfcff] p-5">
-        <h2 className="text-[14px] font-semibold text-[#23304a]">Upload Audio</h2>
+      <section className="mt-3 rounded-2xl border border-[#dde5f6] bg-[linear-gradient(180deg,#fcfdff,#f4f7ff)] p-5 shadow-[0_10px_26px_rgba(88,110,168,0.08)]">
+        <h2 className="text-[14px] font-semibold text-[#253553]">Upload Audio</h2>
         <p className="mt-1 text-[13px] text-[#64748b]">
           MP3, WAV, M4A · max 10 MB · under 1 min
         </p>
@@ -32,10 +32,10 @@ export default function DashboardClient({ initialTranscripts }: DashboardClientP
         </div>
       </section>
 
-      <section className="mt-6 rounded-xl border border-[#e5eaf3] bg-[#fbfcff] p-5">
+      <section className="mt-6 rounded-2xl border border-[#dde5f6] bg-[linear-gradient(180deg,#fcfdff,#f4f7ff)] p-5 shadow-[0_10px_26px_rgba(88,110,168,0.08)]">
         <div className="mb-3 flex items-center gap-2">
-          <h2 className="text-[14px] font-semibold text-[#23304a]">Transcripts</h2>
-          <span className="rounded-full border border-[#d9e3f2] bg-[#f0f5ff] px-2 py-0.5 text-[12px] text-[#55709f]">
+          <h2 className="text-[14px] font-semibold text-[#253553]">Transcripts</h2>
+          <span className="rounded-full border border-[#c9d6f0] bg-[#e9f0ff] px-2 py-0.5 text-[12px] text-[#4f6896]">
             {transcriptCount}
           </span>
         </div>
