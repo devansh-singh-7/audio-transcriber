@@ -16,22 +16,16 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let transcripts: TranscriptItem[] = [];
-
-    try {
-      transcripts = await db
-        .select({
-          id: transcript.id,
-          fileName: transcript.fileName,
-          content: transcript.content,
-          createdAt: transcript.createdAt,
-        })
-        .from(transcript)
-        .where(eq(transcript.userId, session.user.id))
-        .orderBy(desc(transcript.createdAt));
-    } catch {
-      transcripts = [];
-    }
+    const transcripts: TranscriptItem[] = await db
+      .select({
+        id: transcript.id,
+        fileName: transcript.fileName,
+        content: transcript.content,
+        createdAt: transcript.createdAt,
+      })
+      .from(transcript)
+      .where(eq(transcript.userId, session.user.id))
+      .orderBy(desc(transcript.createdAt));
 
     return NextResponse.json(transcripts);
   } catch (error) {

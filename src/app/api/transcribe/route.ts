@@ -68,33 +68,25 @@ export async function POST(request: Request) {
         ? fileNameEntry.trim()
         : audioEntry.name;
 
-    try {
-      await db
-        .insert(user)
-        .values({
-          id: session.user.id,
-          name: "Firebase User",
-          email: `${session.user.id}@firebase.local`,
-          emailVerified: false,
-          createdAt,
-          updatedAt: createdAt,
-        })
-        .onConflictDoNothing({ target: user.id });
-    } catch {
-      // Best-effort sync for Firebase users; continue to transcript insert.
-    }
-
-    try {
-      await db.insert(transcript).values({
-        id,
-        userId: session.user.id,
-        fileName: resolvedFileName,
-        content: transcription,
+    await db
+      .insert(user)
+      .values({
+        id: session.user.id,
+        name: "Firebase User",
+        email: `${session.user.id}@firebase.local`,
+        emailVerified: false,
         createdAt,
-      });
-    } catch {
-      // Best-effort persistence: return transcription even if DB write fails.
-    }
+        updatedAt: createdAt,
+      })
+      .onConflictDoNothing({ target: user.id });
+
+    await db.insert(transcript).values({
+      id,
+      userId: session.user.id,
+      fileName: resolvedFileName,
+      content: transcription,
+      createdAt,
+    });
 
     return NextResponse.json({
       success: true,

@@ -18,25 +18,19 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  let transcripts: TranscriptItem[] = [];
-
-  try {
-    transcripts = await db
-      .select({
-        id: transcript.id,
-        fileName: transcript.fileName,
-        content: transcript.content,
-        createdAt: transcript.createdAt,
-      })
-      .from(transcript)
-      .where(eq(transcript.userId, session.user.id))
-      .orderBy(desc(transcript.createdAt));
-  } catch {
-    transcripts = [];
-  }
+  const transcripts: TranscriptItem[] = await db
+    .select({
+      id: transcript.id,
+      fileName: transcript.fileName,
+      content: transcript.content,
+      createdAt: transcript.createdAt,
+    })
+    .from(transcript)
+    .where(eq(transcript.userId, session.user.id))
+    .orderBy(desc(transcript.createdAt));
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[980px] px-4 py-8">
+    <main className="mx-auto min-h-screen w-full max-w-245 px-4 py-8">
       <div className="rounded-3xl border border-[#d7ddf2] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(245,248,255,0.92))] p-6 shadow-[0_20px_50px_rgba(56,71,117,0.16)] backdrop-blur-sm md:p-7">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
