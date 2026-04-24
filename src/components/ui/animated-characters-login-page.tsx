@@ -288,7 +288,7 @@ function LoginPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="relative hidden flex-col justify-between bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 text-primary-foreground lg:flex">
+      <div className="relative hidden flex-col justify-between bg-linear-to-br from-primary/90 via-primary to-primary/80 p-12 text-primary-foreground lg:flex">
         <div className="relative z-20">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary-foreground/10 backdrop-blur-sm">
@@ -298,8 +298,8 @@ function LoginPage() {
           </div>
         </div>
 
-        <div className="relative z-20 flex h-[500px] items-end justify-center">
-          <div className="relative h-[400px] w-[550px]">
+        <div className="relative z-20 flex h-125 items-end justify-center">
+          <div className="relative h-100 w-137.5">
             <div
               ref={purpleRef}
               className="absolute bottom-0 transition-all duration-700 ease-in-out"
@@ -572,7 +572,7 @@ function LoginPage() {
                 />
               </div>
               <div
-                className="absolute h-[4px] w-20 rounded-full bg-[#2D2D2D] transition-all duration-200 ease-out"
+                className="absolute h-1 w-20 rounded-full bg-[#2D2D2D] transition-all duration-200 ease-out"
                 style={{
                   left:
                     password.length > 0 && showPassword
@@ -590,13 +590,13 @@ function LoginPage() {
 
         <div className="relative z-20" />
 
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-size-[20px_20px]" />
         <div className="absolute right-1/4 top-1/4 size-64 rounded-full bg-primary-foreground/10 blur-3xl" />
         <div className="absolute bottom-1/4 left-1/4 size-96 rounded-full bg-primary-foreground/5 blur-3xl" />
       </div>
 
       <div className="flex items-center justify-center bg-background p-8">
-        <div className="w-full max-w-[420px]">
+        <div className="w-full max-w-105">
           <div className="mb-12 flex items-center justify-center gap-2 text-lg font-semibold lg:hidden">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
               <Music2 className="size-4 text-primary" />
@@ -616,7 +616,7 @@ function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="anna@gmail.com"
+                placeholder="Enter your email"
                 value={email}
                 autoComplete="off"
                 onChange={(event) => setEmail(event.target.value)}
@@ -635,7 +635,7 @@ function LoginPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
