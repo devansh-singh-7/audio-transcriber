@@ -23,6 +23,7 @@ type AuthResult =
     };
 
 type SessionState = {
+  error: string | null;
   user: User | null;
   loading: boolean;
 };
@@ -102,22 +103,55 @@ async function signOut(): Promise<{ error: null } | { error: { message: string }
 
 function useSession() {
   const [session, setSession] = useState<SessionState>({
+    error: null,
     user: firebaseAuth.currentUser,
     loading: true,
   });
 
   useEffect(() => {
-    return onAuthStateChanged(firebaseAuth, (user) => {
-      syncUserCookie(user);
-      setSession({
-        user,
+    const authTimeout = window.setTimeout(() => {
+      setSession((current) => ({
+        ...current,
+        error:
+          current.error ??
+          "Firebase auth is taking too long to restore your session. Try refreshing or signing in again.",
         loading: false,
-      });
-    });
+      }));
+    }, 10000);
+
+    const unsubscribe = onAuthStateChanged(
+      firebaseAuth,
+      (user) => {
+        window.clearTimeout(authTimeout);
+        syncUserCookie(user);
+        setSession({
+          error: null,
+          user,
+          loading: false,
+        });
+      },
+      (error) => {
+        window.clearTimeout(authTimeout);
+        setSession({
+          error:
+            error instanceof Error
+              ? error.message
+              : "Unable to restore your Firebase session.",
+          user: null,
+          loading: false,
+        });
+      }
+    );
+
+    return () => {
+      window.clearTimeout(authTimeout);
+      unsubscribe();
+    };
   }, []);
 
   return {
     data: session.user ? { user: session.user } : null,
+    error: session.error,
     isPending: session.loading,
   };
 }

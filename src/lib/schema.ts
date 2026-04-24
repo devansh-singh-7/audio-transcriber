@@ -54,9 +54,7 @@ export const transcript = pgTable("transcript", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id),
+  userId: text("user_id").notNull(),
   fileName: text("file_name").notNull(),
   content: text("content").notNull(),
   duration: integer("duration"),

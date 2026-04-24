@@ -2,9 +2,10 @@ import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import auth from "@/lib/auth";
-import db from "@/lib/db";
+import { DATABASE_URL_MISSING_MESSAGE, getDb } from "@/lib/db";
+import { ensureDatabaseSchema } from "@/lib/ensure-db";
 import { transcript } from "@/lib/schema";
-import type { TranscriptItem } from "@/components/TranscriptList";
+import type { TranscriptItem } from "@/lib/transcript-types";
 
 export async function GET(request: Request) {
   try {
@@ -15,6 +16,17 @@ export async function GET(request: Request) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const db = getDb();
+
+    if (!db) {
+      return NextResponse.json(
+        { error: DATABASE_URL_MISSING_MESSAGE },
+        { status: 503 }
+      );
+    }
+
+    await ensureDatabaseSchema();
 
     const transcripts: TranscriptItem[] = await db
       .select({

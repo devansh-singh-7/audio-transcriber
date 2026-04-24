@@ -1,13 +1,9 @@
-import { desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import DashboardClient from "@/components/DashboardClient";
-import type { TranscriptItem } from "@/components/TranscriptList";
 import LogoutButton from "@/components/LogoutButton";
 import auth from "@/lib/auth";
-import db from "@/lib/db";
-import { transcript } from "@/lib/schema";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -16,25 +12,6 @@ export default async function DashboardPage() {
 
   if (!session?.user?.id) {
     redirect("/login");
-  }
-
-  let transcripts: TranscriptItem[] = [];
-  let transcriptLoadError = false;
-
-  try {
-    transcripts = await db
-      .select({
-        id: transcript.id,
-        fileName: transcript.fileName,
-        content: transcript.content,
-        createdAt: transcript.createdAt,
-      })
-      .from(transcript)
-      .where(eq(transcript.userId, session.user.id))
-      .orderBy(desc(transcript.createdAt));
-  } catch (error) {
-    transcriptLoadError = true;
-    console.error("Failed to load dashboard transcripts", error);
   }
 
   return (
@@ -71,14 +48,7 @@ export default async function DashboardPage() {
 
         <hr className="my-5 border-[#dfe6f4]" />
 
-        {transcriptLoadError ? (
-          <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            We could not load your saved transcripts right now. New uploads will
-            still be stored, and you can refresh in a moment to try again.
-          </div>
-        ) : null}
-
-        <DashboardClient initialTranscripts={transcripts} />
+        <DashboardClient />
       </div>
     </main>
   );

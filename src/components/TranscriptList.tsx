@@ -2,16 +2,11 @@
 
 import { useMemo, useState } from "react";
 
-export type TranscriptItem = {
-  id: string;
-  fileName: string;
-  content: string;
-  createdAt: string | Date;
-};
+import type { TranscriptItem } from "@/lib/transcript-types";
 
 type TranscriptListProps = {
-  initialTranscripts: TranscriptItem[];
-  newlyAddedTranscript?: TranscriptItem | null;
+  transcripts: TranscriptItem[];
+  isLoading?: boolean;
 };
 
 function formatDate(value: string | Date) {
@@ -26,21 +21,11 @@ function formatDate(value: string | Date) {
 }
 
 export default function TranscriptList({
-  initialTranscripts,
-  newlyAddedTranscript,
+  transcripts,
+  isLoading = false,
 }: TranscriptListProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const transcripts = useMemo(() => {
-    if (!newlyAddedTranscript) {
-      return initialTranscripts;
-    }
-    const deduped = initialTranscripts.filter(
-      (item) => item.id !== newlyAddedTranscript.id
-    );
-    return [newlyAddedTranscript, ...deduped];
-  }, [initialTranscripts, newlyAddedTranscript]);
 
   const hasTranscripts = useMemo(() => transcripts.length > 0, [transcripts]);
 
@@ -63,6 +48,14 @@ export default function TranscriptList({
       setCopiedId((curr) => (curr === id ? null : curr));
     }, 2000);
   };
+
+  if (isLoading) {
+    return (
+      <p className="rounded-xl border border-dashed border-[#d7deec] bg-white py-10 text-center text-[14px] text-[#8798b4]">
+        Loading transcripts...
+      </p>
+    );
+  }
 
   if (!hasTranscripts) {
     return (

@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 
 import auth from "@/lib/auth";
-import db from "@/lib/db";
 import { transcribeAudio } from "@/lib/gemini";
-import { transcript, user } from "@/lib/schema";
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_MIME_TYPES = new Set([
@@ -67,26 +65,6 @@ export async function POST(request: Request) {
       typeof fileNameEntry === "string" && fileNameEntry.trim()
         ? fileNameEntry.trim()
         : audioEntry.name;
-
-    await db
-      .insert(user)
-      .values({
-        id: session.user.id,
-        name: "Firebase User",
-        email: `${session.user.id}@firebase.local`,
-        emailVerified: false,
-        createdAt,
-        updatedAt: createdAt,
-      })
-      .onConflictDoNothing({ target: user.id });
-
-    await db.insert(transcript).values({
-      id,
-      userId: session.user.id,
-      fileName: resolvedFileName,
-      content: transcription,
-      createdAt,
-    });
 
     return NextResponse.json({
       success: true,

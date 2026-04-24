@@ -2,9 +2,12 @@
 
 import { useRef, useState } from "react";
 
-import type { TranscriptItem } from "@/components/TranscriptList";
+import { saveUserTranscript } from "@/lib/firestore-transcripts";
+import type { TranscriptItem } from "@/lib/transcript-types";
 
 type AudioUploaderProps = {
+  userId: string | null;
+  sessionReady: boolean;
   onTranscriptAdded: (transcript: TranscriptItem) => void;
 };
 
@@ -26,7 +29,11 @@ function formatSize(sizeInBytes: number) {
   return `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-export default function AudioUploader({ onTranscriptAdded }: AudioUploaderProps) {
+export default function AudioUploader({
+  userId,
+  sessionReady,
+  onTranscriptAdded,
+}: AudioUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -131,7 +138,13 @@ export default function AudioUploader({ onTranscriptAdded }: AudioUploaderProps)
         throw new Error(payload.error ?? "Transcription failed");
       }
 
+      if (!userId) {
+        throw new Error("Your Firebase session is still loading. Please try again.");
+      }
+
       const addedTranscript = payload.transcript;
+      await saveUserTranscript(userId, addedTranscript);
+
       setTranscriptText(addedTranscript.content);
       onTranscriptAdded(addedTranscript);
     } catch (uploadError) {
@@ -216,7 +229,7 @@ export default function AudioUploader({ onTranscriptAdded }: AudioUploaderProps)
                 className="text-[18px] leading-none text-[#6b7280] transition-colors hover:text-[#2b3b59]"
                 aria-label="Clear selected file"
               >
-                ×
+                x
               </button>
             ) : null}
           </div>
@@ -225,10 +238,10 @@ export default function AudioUploader({ onTranscriptAdded }: AudioUploaderProps)
             <button
               type="button"
               onClick={() => void handleTranscribe()}
-              disabled={isLoading || Boolean(error)}
+              disabled={isLoading || Boolean(error) || !sessionReady || !userId}
               className="h-10 w-full rounded-lg bg-gradient-to-r from-[#5f7cb8] to-[#6e91cf] text-[14px] font-medium text-white shadow-[0_8px_18px_rgba(95,124,184,0.32)] transition-all hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Transcribe
+              {!sessionReady || !userId ? "Preparing session..." : "Transcribe"}
             </button>
           ) : (
             <div>
